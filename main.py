@@ -1,16 +1,18 @@
 import re
 
 
-def input_graph(input):
+def is_line_correct(line):
+    return bool(re.match('^(\[.*\])+[^\[\]]+(\[.*\])+$', line))
+
+
+def input_graph(content):
     graph = {}
     rules = []
-    with open(input) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
     get_params = re.compile('\[([^\[\]]*)\]')
     for line in content:
-        if not bool(re.match('^(\[.*\]+)(.+)(\[.*\]+)$', line)):
+        if not is_line_correct(line):
             graph = None
+            rules = None
             break
         params, func, results = re.split('(?<=\])([^\[\]]+)', line, maxsplit=1)
         params = get_params.findall(params)
@@ -56,8 +58,11 @@ def refactor_answer(ans):
                               refactor_params(rule[2]))
     return refactored_ans
 
-def main():
-    graph, rules = input_graph('input')
+def main(input):
+    with open(input) as f:
+        content = f.readlines()
+    content = [x.strip() for x in content]
+    graph, rules = input_graph(content)
     if not graph:
         return('Incorect input')
     sorted_ver = top_sort(graph)
@@ -71,4 +76,4 @@ def main():
                                           rule[1]))
     return ('\n'.join(refactor_answer(ans)))
 
-print(main())
+#print(main("input"))
